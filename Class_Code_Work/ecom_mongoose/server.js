@@ -12,6 +12,7 @@ import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 dotenv.config();
 import {connectToMongoDB} from "./src/config/mongodb.js";
+import { connectUsingMongoose } from "./src/config/mongooseConfig.js";
 const app = express();
 const PORT = 3000;
 app.use(express.json());
@@ -32,6 +33,7 @@ app.get((req, res) => {
   res.status(404).json({ message: "Route not found" });
 });
 app.listen(PORT, () => {
-  connectToMongoDB();
+  // connectToMongoDB();
+  connectUsingMongoose();
   console.log(`Server is running on http://localhost:${PORT}`);
 });

@@ -1,6 +1,6 @@
 import { ObjectId } from "mongodb";
-import { getClient, getDB } from "../../config/mongodb";
-import OrderModel from "./order.model";
+import { getClient, getDB } from "../../config/mongodb.js";
+import OrderModel from "./order.model.js";
 
 export default class OrderRepository {
   constructor() {
