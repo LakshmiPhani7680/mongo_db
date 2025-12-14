@@ -2,11 +2,13 @@ import ApplicationError from "../error-handler/applicationError.js";
 import { UserModel } from "./user.model.js";
 import jwt from "jsonwebtoken";
 import UserRepository from "./user.repository.js";
+import UserMongooseRepository from "./user.repoMongoose.js";
 import bcrypt from "bcrypt";
 const JWT_SECRET = process.env.JWT_SECRET;
 export class UserController {
   constructor() {
-    this.userRepository = new UserRepository();
+    // this.userRepository = new UserRepository();
+    this.userMongooseRepository = new UserMongooseRepository();
   }
   async signup(req, res) {
     try {
@@ -18,7 +20,8 @@ export class UserController {
       // const user = UserModel.signup(name, email, password, type);
       const hashPassword = await bcrypt.hash(password, 12);
       const user = new UserModel(name, email, hashPassword, type);
-      const newUser = await this.userRepository.signup(user);
+      // const newUser = await this.userRepository.signup(user);
+      const newUser = await this.userMongooseRepository.signup(user);
       res.status(201).json({ message: "User registered successfully", user });
     } catch (err) {
       throw new ApplicationError("Signup Failed", 500);
@@ -31,7 +34,10 @@ export class UserController {
         // const user = UserModel.signin(username, password);
         const user = new UserModel(null, email, password, null);
         // this.userRepository.signin(user);
-        const existingUser = await this.userRepository.findByEmail(email);
+        // const existingUser = await this.userRepository.findByEmail(email);
+        const existingUser = await this.userMongooseRepository.findByEmail(
+          email
+        );
         console.log("Existing user:", existingUser);
         if (existingUser) {
           const result = await bcrypt.compare(password, existingUser.password);

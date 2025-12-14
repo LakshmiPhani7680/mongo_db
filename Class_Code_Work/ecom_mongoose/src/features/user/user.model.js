@@ -1,5 +1,3 @@
-import { getDB } from "../../config/mongodb.js";
-
 export class UserModel {
   constructor(username, email, password, type) {
     this.username = username;
@@ -7,7 +5,7 @@ export class UserModel {
     this.password = password;
     this.type = type;
   }
-  
+
   static getAllUsers() {
     return users;
   }
