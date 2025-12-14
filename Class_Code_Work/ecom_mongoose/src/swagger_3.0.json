@@ -1,0 +1,217 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "version": "1.0.0",
+        "title": "E-commerce API",
+        "description": "API documentation for the E-commerce application"
+    },
+    "servers": [
+        {
+            "url": "http://localhost:3000/api"
+        }
+    ],
+    "components":{
+        "securitySchemes":{
+            "JWT":{
+                "in":"header",
+                "name":"Authorization",
+                "type":"apiKey"
+            }
+        }
+    },
+    "paths":{
+        "/users/signup": {
+            "post": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Register a new user",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "email": {
+                                        "type": "string"
+                                    },
+                                    "password": {
+                                        "type": "string"
+                                    },
+                                    "type": {
+                                        "type": "string",
+                                        "enum": ["buyer", "seller", "customer"]
+                                    }
+                                },
+                                "required": ["name", "email", "password", "type"]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "User registered successfully"
+                    },
+                    "400": {
+                        "description": "Invalid input"
+                    }
+                }
+            }
+        },
+         "/users/signin": {
+            "post": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Login a user",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "username": {
+                                        "type": "string"
+                                    },
+                                    "password": {
+                                        "type": "string"
+                                    }
+                                },
+                                "required": ["username", "password"]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "User logged in successfully"
+                    },
+                    "401": {
+                        "description": "Invalid credentials"
+                    }
+                }
+            }
+        },
+
+        "/products":{
+            "get":{
+                "tags":[
+                    "Products"
+                ],
+                "summary":"Retrieve a list of products",
+                "security":[
+                    {
+                        "JWT":{}
+                    }
+                ],
+                "responses":{
+                    "200":{
+                        "description":"OK"
+                    },
+                    "401":{
+                        "description":"Unauthorized"
+                    }
+                }
+            }
+        },
+
+        "/cart/items":{
+            "get":{
+                "tags":[
+                    "Cart Items"
+                ],
+                "summary":"Retrieve cart items for the authenticated user",
+                "security":[
+                    {
+                        "JWT":{}
+                    }
+                ],
+                "responses":{
+                    "200":{
+                        "description":"OK"
+                    },
+                    "401":{
+                        "description":"Unauthorized"
+                    }
+                }
+            }
+        },
+        "/cart/add":{
+            "post":{
+                "tags":[
+                    "Cart"
+                ],
+                "summary":"Add an item to the cart for the authenticated user",
+                "security":[
+                    {
+                        "JWT":{}
+                    }
+                ],
+                "requestBody":{
+                    "required":true,
+                    "content":{
+                        "application/json":{
+                            "schema":{
+                                "type":"object",
+                                "properties":{
+                                    "productId":{
+                                        "type":"integer"
+                                    },
+                                    "quantity":{
+                                        "type":"integer"
+                                    }
+                                },
+                                "required":["productId","quantity"]
+                            }
+                        }
+                    }
+                },
+                "responses":{
+                    "200":{
+                        "description":"Item added to cart"
+                    },
+                    "401":{
+                        "description":"Unauthorized"
+                    }
+                }
+            }
+        },
+        "/cart/item/{id}":{
+            "delete":{
+                "tags":[
+                    "Cart"
+                ],
+                "summary":"Remove an item from the cart for the authenticated user",
+                "security":[
+                    {
+                        "JWT":{}
+                    }
+                ],
+                "parameters":[
+                    {
+                        "name":"id",
+                        "in":"path",
+                        "required":true,
+                        "schema":{
+                            "type":"integer"
+                        },
+                        "description":"ID of the cart item to remove"
+                    }
+                ],
+                "responses":{
+                    "200":{
+                        "description":"Item removed from cart"
+                    },
+                    "401":{
+                        "description":"Unauthorized"
+                    }
+                }
+            }
+        }
+    }
+}
