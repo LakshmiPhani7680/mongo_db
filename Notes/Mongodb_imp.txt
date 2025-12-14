@@ -1,0 +1,93 @@
+Mongodb Funcs:
+1. Show dbs
+2. db_name.collection_name.insertOne({})
+3. Show Collections
+4. db_name.collection_name.insertMany([{},{}])
+5. db_name.collection_name.find()without cond
+6. db_name.collection_name.findOne({attr: ""})
+7. db_name.collection_name.find({}) with cond
+8. db_name.collection_name.updateOne({<filter>, {$set: {author: "Phani"}}})
+9. db_name.collection_name.updateOne({filter},{$inc: {
+	quantity: quantity // it will update or create
+}}, {upsert: true})
+10. db_name.collection_name(
+{productId: new ObjectId(productId), userId: new ObjectId(userId)},
+{$setOnInsert: {
+_id: id //only insert
+},
+$inc: {
+quantity: quantity
+}
+},{upsert: true}
+)
+11. db_name.collection_name.aggregate([
+{	// Get Average Price per category
+	$group: {
+		_id: "$category",
+		averagePrice: {$avg: "$price"}
+	}
+}
+]).toArray()
+12. db_name.collection_name.aggregate([
+{
+	$project:{
+		name:1, countOfRating:{
+		$cond:{
+			if: {	$isArray:"$ratings"
+	}, then: {$size: "$ratings"}, else:0
+		}
+}
+	},
+{
+	$sort: {countOfRatings: -1}
+},
+{
+	$limit: 1
+}
+}
+])
+13. db_name.collection_name.aggregate([
+{
+	$match: {userId: new ObjectId(userId)}
+},
+{
+	$lookup:{
+		from: "products",
+		localField: "productid",
+		foreignField: "_id",
+		as: "productInfo"
+}
+}
+])
+14. mongod --replSet rs0 -dbpath "C:\Program Files\MongoDB\Server\8.2\data"
+15. await db.collection(collectionName).createIndex({ age: 1, grade: -1 });
+16. const students = await db
+        .collection(collectionName)
+        .aggregate([
+          { $unwind: "$scores" },
+          {
+            $group: {
+              _id: "$_id",
+              name: { $first: "$name" },
+              averageScore: { $avg: "$scores" },
+            },
+          },
+        ])
+        .toArray();
+==========
+Excercise:
+1. Project Name of product and Count of Rating using aggregation and condition.
+2. Find the product with highest number of Ratings.
+3. Transaction in db:
+=>
+
+4. Match, addField, multiply
+--------
+1. Get CartItems of user, calculate the total amount.
+2. Create a record for order.
+3. Reduce the prod quantity.
+4. Clear the cart.
+5. deduct the payment.
+6. Inform to sellers.
+7. Inform to courier.
+----------
