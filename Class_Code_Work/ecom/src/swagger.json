@@ -1,0 +1,189 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "version": "1.0.0",
+        "title": "E-commerce API",
+        "description": "API documentation for the E-commerce application"
+    },
+    "host": "localhost:3000",
+    "basePath": "/api",
+    "schemes": [
+        "http"
+    ],
+    "paths": {
+        "/cart/item/{id}": {
+            "delete": {
+                "tags": [
+                    "Cart"
+                ],
+                "summary": "Delete an item from the cart",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "type": "integer",
+                        "description": "ID of the cart item to delete"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Item deleted from cart"
+                    },
+                    "404": {
+                        "description": "Item not found in cart"
+                    }
+                }
+            }
+        },
+        "/cart/items": {
+            "get": {
+                "tags": [
+                    "Cart"
+                ],
+                "summary": "Get all items in the cart",
+                "responses": {
+                    "200": {
+                        "description": "List of cart items",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "items": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/definitions/CartItem"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/cart/add": {
+            "post": {
+                "tags": [
+                    "Cart"
+                ],
+                "summary": "Add an item to the cart",
+                "parameters": [
+                    {
+                        "name": "productId",
+                        "in": "query",
+                        "required": true,
+                        "type": "integer",
+                        "description": "ID of the product to add"
+                    },
+                    {
+                        "name": "quantity",
+                        "in": "query",
+                        "required": true,
+                        "type": "integer",
+                        "description": "Quantity of the product to add"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Item added to cart"
+                    }
+                }
+            }
+        },
+        "/products": {
+            "get": {
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Get all products",
+                "responses": {
+                    "200": {
+                        "description": "List of products",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Product"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/users/signup": {
+            "post": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Create a new user",
+                "parameters": [
+                    {
+                        "name": "username",
+                        "in": "body",
+                        "required": true,
+                        "type": "string",
+                        "description": "Username of the new user"
+                    },
+                    {
+                        "name": "password",
+                        "in": "body",
+                        "required": true,
+                        "type": "string",
+                        "description": "Password of the new user"
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "User created successfully"
+                    }
+                }
+            }
+        },
+        "/users/signin": {
+            "post": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Login a user",
+                "parameters": [
+                   {
+                    "in": "body",
+                    "name": "body",
+                    "required": true,
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "email": {
+                                "type": "string"
+                            },
+                            "password": {
+                                "type": "string"
+                            }
+                        },
+                        "required": ["username", "password"]
+                    }
+                   }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User logged in successfully"
+                    },
+                    "401": {
+                        "description": "Invalid credentials"
+                    }
+                }
+            }
+        },
+        "/": {
+            "get": {
+                "tags": [
+                    "Root"
+                ],
+                "summary": "Welcome message",
+                "responses": {
+                    "200": {
+                        "description": "Welcome to the E-commerce API"
+                    }
+                }
+            }
+        }
+    }
+}
