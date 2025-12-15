@@ -8,4 +8,8 @@ router.post("/signup", (req, res) => {
 router.post("/signin", (req, res) => {
   userController.signin(req, res);
 });
+router.put("/reset-password", (req, res) => {
+  userController.resetPassword(req, res);
+});
+
 export default router;

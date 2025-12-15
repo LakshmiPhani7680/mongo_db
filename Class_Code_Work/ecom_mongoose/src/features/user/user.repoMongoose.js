@@ -18,21 +18,40 @@ export default class UserMongooseRepository {
   }
   async signin(email, password) {
     try {
-      return await new UserMongooseModel.findOne({ email, password });
+      return await UserMongooseModel.findOne({ email, password });
     } catch (err) {
       console.log(err);
       throw new ApplicationError("Error while signin from mongoose");
     }
   }
 
-  async findByEmail(emailId) {
+  async findByEmail(email) {
     try {
-      return await new UserMongooseModel.findOne({ emailId });
+      console.log("Finding user by email in mongoose:", email);
+      const user = await UserMongooseModel.findOne({ email });
+      console.log("User found:", user);
+      return user;
     } catch (err) {
       console.log(err);
       throw new ApplicationError(
         "Error while finding user using email from mongoose"
       );
+    }
+  }
+
+  async updatePassword(userId, newPassword) {
+    try {
+      const user = await UserMongooseModel.findById(userId);
+
+      if (!user) {
+        throw new ApplicationError("User not found");
+      }
+
+      user.password = newPassword; // should be hashed
+      await user.save();
+    } catch (err) {
+      console.log(err);
+      throw new ApplicationError("Error while updating password from mongoose");
     }
   }
 }
