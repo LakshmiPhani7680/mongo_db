@@ -17,22 +17,32 @@ export default class ProductController {
       res.status(404).send({ message: "Product not found" });
     }
   }
-  async addProduct(req, res) {
-    console.log(req.body);
-    const { name, desc, price, imageUrl, category, sizes } = req.body;
-    const newProduct = {
-      name,
-      price: parseFloat(price),
-      sizes: sizes,
-      imageUrl: imageUrl || "",
-      desc: desc || "",
-      category: category || "General",
-    };
-    const record = await this.productRepository.addProduct(newProduct);
-    res
-      .status(201)
-      .send({ message: "Product added successfully", product: record });
+  async addProduct(req, res, next) {
+    try {
+      const { name, description, price, imageUrl, categories, sizes } =
+        req.body;
+
+      const newProduct = {
+        name,
+        desc: description || "",
+        price: Number(price),
+        imageUrl: imageUrl || "",
+        sizes: sizes || [],
+        category: categories, // IMPORTANT
+      };
+
+      const record = await this.productRepository.addProduct(newProduct);
+
+      res.status(201).json({
+        success: true,
+        message: "Product added successfully",
+        product: record,
+      });
+    } catch (err) {
+      next(err);
+    }
   }
+
   async rateProduct(req, res) {
     const { userId, productId, rating } = req.body;
     console.log("Rating request received:", { userId, productId, rating });

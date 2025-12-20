@@ -1,7 +1,14 @@
 import { ObjectId } from "mongodb";
 import { getDB } from "../../config/mongodb.js";
 import ApplicationError from "../error-handler/applicationError.js";
+import mongoose from "mongoose";
+import { productSchema } from "./product.schema.js";
+import { reviewSchema } from "./review.schema.js";
+import { categorySchema } from "./category.schema.js";
 
+const productModel = mongoose.model("Product", productSchema);
+const reviewModel = mongoose.model("Review", reviewSchema);
+const categoryModel = mongoose.model("Category", categorySchema);
 class ProductRepository {
   constructor() {
     this.collectionName = "products";
@@ -21,23 +28,33 @@ class ProductRepository {
 
   async addProduct(product) {
     try {
-      const db = await getDB();
-      const collection = await db.collection(this.collectionName);
-      const newProduct = await collection.insertOne(product);
-      return newProduct;
+      const newProduct = new productModel(product);
+      const savedProduct = await newProduct.save();
+
+      await categoryModel.updateMany(
+        { _id: { $in: product.category } },
+        { $push: { products: savedProduct._id } }
+      );
+
+      return savedProduct;
     } catch (err) {
-      console.trace(err);
-      throw new ApplicationError("Database Insertion Failed", 500);
+      // IMPORTANT: preserve mongoose error
+      if (err.name === "ValidationError") {
+        throw err;
+      }
+      throw new ApplicationError(err.message, 500);
     }
   }
 
   async getAll() {
     try {
-      const db = await getDB();
-      console.log("DB obtained in repository", db);
-      const collection = await db.collection(this.collectionName);
-      console.log("Collection obtained in repository", collection);
-      const products = await collection.find({}).toArray();
+      // const db = await getDB();
+      // console.log("DB obtained in repository", db);
+      // const collection = await db.collection(this.collectionName);
+      // console.log("Collection obtained in repository", collection);
+      // const products = await collection.find({}).toArray();
+      // return products;
+      const products = await productModel.find({});
       return products;
     } catch (err) {
       console.trace(err);
@@ -64,32 +81,29 @@ class ProductRepository {
   }
   async rateProduct(userId, productId, rating) {
     try {
-      const db = await getDB();
-      const collection = await db.collection(this.collectionName);
-      const user = await db
-        .collection("users")
-        .findOne({ _id: new ObjectId(userId) });
-      if (!user) {
-        throw new Error("User not found");
+      const productToUpdate = await productModel.findById(productId);
+      if (!productToUpdate) {
+        throw new ApplicationError("Product not found", 404);
       }
-      console.log("Rating productId:", productId);
-      const product = this.getById(productId);
-      if (!product) {
-        throw new Error("Product not found");
+      const reviewUser = await reviewModel.findOne({
+        product: productId,
+        user: userId,
+      });
+      if (reviewUser) {
+        // Update existing review
+        reviewUser.rating = rating;
+        await reviewUser.save();
+      } else {
+        // Create new review
+        const newReview = new reviewModel({
+          product: new ObjectId(productId),
+          user: new ObjectId(userId),
+          rating: rating,
+        });
+        await newReview.save();
+        productToUpdate.reviews.push(newReview._id);
+        await productToUpdate.save();
       }
-      // if (!product.ratings) {
-      //   product.ratings = [];
-      //   product.ratings.push({ userId, rating });
-      // } else {
-      //   const existingRatingIndex = product.ratings.findIndex(
-      //     (r) => r.userId === userId
-      //   );
-      //   if (existingRatingIndex !== -1) {
-      //     product.ratings[existingRatingIndex].rating = rating;
-      //   } else {
-      //     product.ratings.push({ userId, rating });
-      //   }
-      // }
     } catch (err) {
       console.trace(err);
       throw new ApplicationError("Database Update Failed", 500);
