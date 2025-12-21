@@ -2,6 +2,7 @@ import express from "express";
 import productRoutes from "./src/features/product/product.routes.js";
 import userRoutes from "./src/features/user/user.routes.js";
 import orderRoutes from "./src/features/order/order.routes.js";
+import likeRoutes from "./src/features/likes/likes.routes.js";
 import basicAuthorizer from "./src/middlewares/basicAuth.middleware.js";
 import cartRoutes from "./src/features/cart/cart.routes.js";
 import jwtAuth from "./src/middlewares/jwt.middleware.js";
@@ -22,6 +23,7 @@ app.use("/api/products", jwtAuth, productRoutes);
 app.use("/api/orders", jwtAuth, orderRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/cart", jwtAuth, cartRoutes);
+app.use("/api/likes", jwtAuth, likeRoutes)
 app.get("/", (req, res) => {
   res.send("Welcome to the E-commerce API");
 });
